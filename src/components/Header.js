@@ -1,4 +1,5 @@
 import {LOGO_URL} from "../utils/constants";
+import {Link} from "react-router";
 export const Header = () => {
     return (
       <div className="header">
@@ -10,10 +11,18 @@ export const Header = () => {
   
         <div className="nav-items">
           <ul>
-            <li>Home</li>
-            <li>About</li>
-            <li>Contact</li>
-            <li>Cart</li>
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/about">About</Link>
+            </li>
+            <li>
+              <Link to="/contact">Contact</Link>
+            </li>
+            <li>
+              <Link to="/cart">Cart</Link>
+            </li>
           </ul>
         </div>
       </div>

@@ -1,9 +1,10 @@
+import { Link } from "react-router";
 import { useEffect, useState } from "react";
 import { RestaurantCard } from "./RestaurantCard";
 import { SWIGGY_IMAGE_BASE_URL } from "../utils/constants";
 const fetchData = async () => {
   const data = await fetch(
-    "https://www.swiggy.com/dapi/restaurants/list/v5?lat=19.9615398&lng=79.2961468&is-seo-homepage-enabled=true&page_type=DESKTOP_WEB_LISTING",
+    "https://namastedev.com/api/v1/listRestaurants",
   );
   if (!data.ok) {
     throw new Error(
@@ -33,7 +34,7 @@ export const Body = () => {
     const getRestaurants = async () => {
       try {
         const json = await fetchData();
-        const restaurants = extractRestaurants(json?.data?.cards);
+        const restaurants = extractRestaurants(json?.data?.data.cards);
         setListOfRestaurants(restaurants);
       } catch (err) {
         console.error("Failed to fetch restaurants:", err);
@@ -68,15 +69,16 @@ export const Body = () => {
           <p>No restaurants found.</p>
         ) : (
           listOfRestaurants.map((restaurant) => (
-            <RestaurantCard
-              resName={restaurant.info.name}
-              key={restaurant.info.id}
-              cuisine={restaurant.info.cuisines?.join(", ")}
-              rating={restaurant.info.avgRating}
-              imageUrl={
-                SWIGGY_IMAGE_BASE_URL + restaurant.info.cloudinaryImageId
-              }
-            />
+            <Link to={"/restaurant/" + restaurant.info.id} key={restaurant.info.id} style={{textDecoration: "none", color: "inherit"}}>
+              <RestaurantCard
+                resName={restaurant.info.name}
+                cuisine={restaurant.info.cuisines?.join(", ")}
+                rating={restaurant.info.avgRating}
+                imageUrl={
+                  SWIGGY_IMAGE_BASE_URL + restaurant.info.cloudinaryImageId
+                }
+              />
+            </Link>
           ))
         )}
       </div>
