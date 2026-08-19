@@ -1,19 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router";
+import { SWIGGY_IMAGE_BASE_URL } from "../utils/constants";
 
-const fetchMenuData = async (resId) => {
-  const swiggyUrl = `https://namastedev.com/api/v1/listRestaurantMenu/${resId}`;
-
-  // Use proxy and add headers
-  const response = await fetch(swiggyUrl);
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch menu: ${response.status} ${response.statusText}`);
-  }
-  const json = await response.json();
-  // Return the parsed JSON from the response stream
-  return json;
-};
+import { useRestaurantMenu } from "../utils/useRestaurantMenu";
 
 export const RestaurantMenu = () => {
   const [menuItems, setMenuItems] = useState(null);
@@ -21,15 +10,12 @@ export const RestaurantMenu = () => {
   const [loading, setLoading] = useState(true);
   const { resId } = useParams();
 
+  const { restaurantMenu: json, loading: hookLoading, error: hookError } = useRestaurantMenu(resId);
+
   useEffect(() => {
-    const getMenu = async () => {
+    if (json) {
       setLoading(true);
       try {
-        const json = await fetchMenuData(resId);
-        
-        console.log("datat of menu", json);
-        
-
         const cards = json?.data?.cards[4]?.groupedCard?.cardGroupMap?.REGULAR?.cards;
         const info = json?.data?.cards[2]?.card?.card?.info;
 
@@ -42,18 +28,17 @@ export const RestaurantMenu = () => {
 
         setRestaurantInfo(info);
         setMenuItems(allItems);
+        setLoading(false);
       } catch (err) {
-        console.error(`Failed to fetch menu for restaurant ${resId}:`, err);
+        console.error(`Failed to process menu for restaurant ${resId}:`, err);
         setMenuItems({ error: err.message });
-      } finally {
         setLoading(false);
       }
-    };
-
-    if (resId) {
-      getMenu();
+    } else if (hookError) {
+      setMenuItems({ error: hookError });
+      setLoading(false);
     }
-  }, [resId]);
+  }, [json, hookError, resId]);
 
   if (menuItems?.error) {
     return (
@@ -66,7 +51,7 @@ export const RestaurantMenu = () => {
     );
   }
 
-  if (loading) {
+  if (loading || hookLoading) {
     return <div className="menu-loading">Loading menu...</div>;
   }
 
@@ -116,7 +101,7 @@ export const RestaurantMenu = () => {
                   {itemInfo.imageId && (
                     <div className="item-image" style={{ marginLeft: "20px" }}>
                       <img
-                        src={`https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_208,h_208,c_fit/${itemInfo.imageId}`}
+                        src={`${SWIGGY_IMAGE_BASE_URL}${itemInfo.imageId}`}
                         alt={itemInfo.name}
                         style={{
                           width: "100px",

@@ -1,7 +1,12 @@
+import {User} from "./User";
+import { UserClass } from "./UserClass";
+
 export const About = () => {
   return (
     <div className="about">
       <h1>About Us</h1>
+      <User />
+      <UserClass />
       <p>
         Welcome to our food ordering app! We are passionate about bringing you the best dining experience right at your fingertips. Our app allows you to explore a wide variety of restaurants, cuisines, and dishes from the comfort of your home.
       </p>
