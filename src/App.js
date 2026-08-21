@@ -15,16 +15,20 @@
  *
  */
 
-import React from "react";
+import React, {lazy} from "react";
 import ReactDOM from "react-dom/client";
 import "../index.css";
 import { Header } from "./components/Header";
 import { Body } from "./components/Body";
 import { Error } from "./components/Error";
-import { About } from "./components/About";
+// import { About } from "./components/About";
 import { Contact } from "./components/Contact";
+// import { Grocery } from "./components/Grocery";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router";
 import { RestaurantMenu } from "./components/RestaurantMenu";
+
+const About  = lazy(() => import("./components/About").then(module => ({ default: module.About })));
+const Grocery = lazy(() => import("./components/Grocery").then(module => ({ default: module.Grocery })));
 const AppLayout = () => {
   return (
     <div id="app">
@@ -49,6 +53,11 @@ const appRoutes = createBrowserRouter([
         path: "/about",
         element: <About />,
         errorElement: <Error message="about page" />,
+      },
+      {
+        path: "/grocery",
+        element: <Grocery />,
+        errorElement: <Error message="grocery page" />,
       },
       {
         path: "/contact",

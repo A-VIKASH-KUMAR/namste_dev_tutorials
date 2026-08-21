@@ -2,10 +2,9 @@ import { Link } from "react-router";
 import { useEffect, useState } from "react";
 import { RestaurantCard } from "./RestaurantCard";
 import { SWIGGY_IMAGE_BASE_URL } from "../utils/constants";
+import { useIsOnline } from "../utils/useIsOnline";
 const fetchData = async () => {
-  const data = await fetch(
-    "https://namastedev.com/api/v1/listRestaurants",
-  );
+  const data = await fetch("https://namastedev.com/api/v1/listRestaurants");
   if (!data.ok) {
     throw new Error(
       `Failed to fetch restaurants: ${data.status} ${data.statusText}`,
@@ -27,6 +26,8 @@ const extractRestaurants = (cards) => {
 };
 export const Body = () => {
   const [listOfRestaurants, setListOfRestaurants] = useState([]);
+  const [filteredRestaurants, setFilteredRestaurants] = useState([]);
+  const [searchText, setSearchText] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -36,6 +37,7 @@ export const Body = () => {
         const json = await fetchData();
         const restaurants = extractRestaurants(json?.data?.data.cards);
         setListOfRestaurants(restaurants);
+        setFilteredRestaurants(restaurants);
       } catch (err) {
         console.error("Failed to fetch restaurants:", err);
         setError(
@@ -46,9 +48,17 @@ export const Body = () => {
         setIsLoading(false);
       }
     };
+
     getRestaurants();
   }, []);
-
+  const onlineStatus = useIsOnline();
+  if (onlineStatus === false) {
+    return (
+      <div className="body">
+        ⚠️ You are offline. Please check your internet connection.
+      </div>
+    );
+  }
   if (isLoading) {
     return <div className="body">Loading restaurants...</div>;
   }
@@ -59,17 +69,33 @@ export const Body = () => {
 
   return (
     <div className="body">
-      <div className="search">
-        <input type="text" placeholder="Search for restaurants" />
-        <button>Search</button>
+      <div className="px-2">
+        <input className="px-2 border-2 "
+          type="text"
+          placeholder="Search for restaurants"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+        />
+        <button className="m-4 px-4 bg-green-300 rounded-lg" onClick={() => {
+          const filteredData = listOfRestaurants.filter((res) =>
+            res.info.name.toLowerCase().includes(searchText.toLowerCase())
+          );
+          setFilteredRestaurants(filteredData);
+        }}>
+          Search
+        </button>
       </div>
 
-      <div className="restaurant-container">
-        {listOfRestaurants.length === 0 ? (
+      <div className="flex flex-wrap">
+        {filteredRestaurants.length === 0 ? (
           <p>No restaurants found.</p>
         ) : (
-          listOfRestaurants.map((restaurant) => (
-            <Link to={"/restaurant/" + restaurant.info.id} key={restaurant.info.id} style={{textDecoration: "none", color: "inherit"}}>
+          filteredRestaurants.map((restaurant) => (
+            <Link
+              to={"/restaurant/" + restaurant.info.id}
+              key={restaurant.info.id}
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
               <RestaurantCard
                 resName={restaurant.info.name}
                 cuisine={restaurant.info.cuisines?.join(", ")}
