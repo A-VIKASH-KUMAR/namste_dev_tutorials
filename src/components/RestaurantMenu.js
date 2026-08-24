@@ -60,20 +60,20 @@ export const RestaurantMenu = () => {
   return (
     <div className="restaurant-menu">
       <div className="restaurant-summary">
-        <h1>{name || `Restaurant ${resId}`}</h1>
-        {cuisines && <p className="cuisines">Cuisines: {cuisines.join(", ")}</p>}
-        {areaName && <p className="location">Location: {areaName}</p>}
-        <p className="rating-cost">
+        <h1 className="font-bold p-2">{name || `Restaurant ${resId}`}</h1>
+        {cuisines && <p className="px-2">Cuisines: {cuisines.join(", ")}</p>}
+        {areaName && <p className="px-2">Location: {areaName}</p>}
+        <p className="p-2">
           {avgRating && <span>⭐ {avgRating}</span>}
           {avgRating && costForTwoMessage && <span> • </span>}
           {costForTwoMessage && <span>{costForTwoMessage}</span>}
         </p>
       </div>
 
-      <h2>Menu</h2>
+      <h2 className="px-2">Menu</h2>
       <div className="menu-items-container">
         {menuItems && menuItems.length > 0 ? (
-          <ul className="menu-items-list" style={{ listStyle: "none", padding: 0 }}>
+          <ul className="p-1">
             {menuItems.map((item) => {
               const itemInfo = item?.card?.info;
               if (!itemInfo) return null;

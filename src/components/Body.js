@@ -1,8 +1,11 @@
 import { Link } from "react-router";
 import { useEffect, useState } from "react";
-import { RestaurantCard } from "./RestaurantCard";
+import { RestaurantCard, WithvegNonVegLabel  } from "./RestaurantCard";
 import { SWIGGY_IMAGE_BASE_URL } from "../utils/constants";
 import { useIsOnline } from "../utils/useIsOnline";
+
+const WithvegNonVegLabelWrapped = WithvegNonVegLabel(RestaurantCard);
+
 const fetchData = async () => {
   const data = await fetch("https://namastedev.com/api/v1/listRestaurants");
   if (!data.ok) {
@@ -70,7 +73,7 @@ export const Body = () => {
   return (
     <div className="body">
       <div className="px-2">
-        <input className="px-2 border-2 "
+        <input className="px-2 border-2 rounded-lg"
           type="text"
           placeholder="Search for restaurants"
           value={searchText}
@@ -96,13 +99,14 @@ export const Body = () => {
               key={restaurant.info.id}
               style={{ textDecoration: "none", color: "inherit" }}
             >
-              <RestaurantCard
+              <WithvegNonVegLabelWrapped
                 resName={restaurant.info.name}
                 cuisine={restaurant.info.cuisines?.join(", ")}
                 rating={restaurant.info.avgRating}
                 imageUrl={
                   SWIGGY_IMAGE_BASE_URL + restaurant.info.cloudinaryImageId
                 }
+                veg={restaurant.info.veg}
               />
             </Link>
           ))
