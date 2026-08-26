@@ -3,11 +3,13 @@ import { useParams } from "react-router";
 import { SWIGGY_IMAGE_BASE_URL } from "../utils/constants";
 
 import { useRestaurantMenu } from "../utils/useRestaurantMenu";
+import { RestaurantCategory } from "./RestaurantCategory";
 
 export const RestaurantMenu = () => {
   const [menuItems, setMenuItems] = useState(null);
   const [restaurantInfo, setRestaurantInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showIndex, setShowIndex] = useState(null);
   const { resId } = useParams();
 
   const { restaurantMenu: json, loading: hookLoading, error: hookError } = useRestaurantMenu(resId);
@@ -23,11 +25,8 @@ export const RestaurantMenu = () => {
           (c) => c?.card?.card?.["@type"] === "type.googleapis.com/swiggy.presentation.food.v2.ItemCategory"
         );
 
-        let allItems = [];
-        filteredCards?.forEach((c) => allItems.push(...(c?.card?.card?.itemCards || [])));
-
         setRestaurantInfo(info);
-        setMenuItems(allItems);
+        setMenuItems(filteredCards);
         setLoading(false);
       } catch (err) {
         console.error(`Failed to process menu for restaurant ${resId}:`, err);
@@ -42,9 +41,9 @@ export const RestaurantMenu = () => {
 
   if (menuItems?.error) {
     return (
-      <div className="restaurant-menu">
-        <div className="error-message">
-          <h2>⚠️ Unable to load menu</h2>
+      <div className="max-w-4xl mx-auto p-4 flex justify-center mt-10">
+        <div className="bg-red-50 text-red-600 border border-red-200 p-6 rounded-lg text-center">
+          <h2 className="text-xl font-bold mb-2">⚠️ Unable to load menu</h2>
           <p>{menuItems.error}</p>
         </div>
       </div>
@@ -52,72 +51,41 @@ export const RestaurantMenu = () => {
   }
 
   if (loading || hookLoading) {
-    return <div className="menu-loading">Loading menu...</div>;
+    return <div className="text-center p-10 text-xl text-gray-500">Loading menu...</div>;
   }
 
   const { name, cuisines, areaName, costForTwoMessage, avgRating } = restaurantInfo || {};
 
   return (
-    <div className="restaurant-menu">
-      <div className="restaurant-summary">
-        <h1 className="font-bold p-2">{name || `Restaurant ${resId}`}</h1>
-        {cuisines && <p className="px-2">Cuisines: {cuisines.join(", ")}</p>}
-        {areaName && <p className="px-2">Location: {areaName}</p>}
-        <p className="p-2">
-          {avgRating && <span>⭐ {avgRating}</span>}
-          {avgRating && costForTwoMessage && <span> • </span>}
-          {costForTwoMessage && <span>{costForTwoMessage}</span>}
-        </p>
+    <div className="max-w-4xl mx-auto p-4 md:p-6">
+      <div className="bg-white border text-center border-gray-200 rounded-2xl p-6 shadow-sm mb-8">
+        <h1 className="text-3xl font-extrabold text-gray-800 mb-2">{name || `Restaurant ${resId}`}</h1>
+        {cuisines && <p className="text-gray-600 font-medium mb-1">{cuisines.join(", ")}</p>}
+        {areaName && <p className="text-gray-500 mb-3">{areaName}</p>}
+        <div className="flex items-center justify-center gap-2 text-sm font-semibold">
+          {avgRating && <span className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-md">⭐ {avgRating}</span>}
+          {avgRating && costForTwoMessage && <span className="text-gray-300">•</span>}
+          {costForTwoMessage && <span className="text-gray-700">{costForTwoMessage}</span>}
+        </div>
       </div>
 
-      <h2 className="px-2">Menu</h2>
-      <div className="menu-items-container">
+      <h2 className="text-2xl font-bold text-gray-800 mb-4 px-2">Menu</h2>
+      <div className="bg-white rounded-xl shadow-sm p-2 md:p-4">
         {menuItems && menuItems.length > 0 ? (
-          <ul className="p-1">
-            {menuItems.map((item) => {
-              const itemInfo = item?.card?.info;
-              if (!itemInfo) return null;
-              return (
-                <li
-                  key={itemInfo.id}
-                  className="menu-item"
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    margin: "20px 0",
-                    padding: "10px",
-                    borderBottom: "1px solid #ccc",
-                  }}
-                >
-                  <div className="item-details">
-                    <h3>{itemInfo.name}</h3>
-                    <p>₹{(itemInfo.price || itemInfo.defaultPrice || 0) / 100}</p>
-                    {itemInfo.description && (
-                      <p style={{ fontSize: "12px", color: "gray", marginTop: "10px" }}>
-                        {itemInfo.description}
-                      </p>
-                    )}
-                  </div>
-                  {itemInfo.imageId && (
-                    <div className="item-image" style={{ marginLeft: "20px" }}>
-                      <img
-                        src={`${SWIGGY_IMAGE_BASE_URL}${itemInfo.imageId}`}
-                        alt={itemInfo.name}
-                        style={{
-                          width: "100px",
-                          height: "100px",
-                          objectFit: "cover",
-                          borderRadius: "8px",
-                        }}
-                      />
-                    </div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+          <div>
+            {menuItems.map((category, index) => (
+              <RestaurantCategory
+                key={category?.card?.card?.title}
+                data={category?.card?.card}
+                showItems={index === showIndex}
+                setShowIndex={() => setShowIndex(index === showIndex ? null : index)}
+              />
+            ))}
+          </div>
         ) : (
-          <p>No menu items found or unsupported menu format.</p>
+          <p className="text-gray-500 text-center py-10">
+            No menu items found or unsupported menu format.
+          </p>
         )}
       </div>
     </div>

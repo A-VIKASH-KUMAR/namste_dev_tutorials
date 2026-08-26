@@ -1,6 +1,10 @@
 import {LOGO_URL} from "../utils/constants";
+import {UserContext} from "../utils/UserContext";
 import {Link} from "react-router";
+import { useState, useContext } from "react";
 export const Header = () => {
+  const [btnNameLogin, setBtnNameLogin] = useState("Login");
+  const {LoggedInData} = useContext(UserContext);
     return (
       <div className="flex justify-between bg-green-300 shadow-lg">
         <div className="logo-container">
@@ -28,6 +32,14 @@ export const Header = () => {
             <li className="px-4">
               <Link to="/grocery">Grocery</Link>
             </li>
+            <button className="login" onClick={() => {
+              if (btnNameLogin === "Login") {
+                setBtnNameLogin("Logout");
+              } else {
+                setBtnNameLogin("Login");
+              }}}>
+              {btnNameLogin === "Logout" && LoggedInData ? LoggedInData : btnNameLogin} 
+            </button>
           </ul>
         </div>
       </div>

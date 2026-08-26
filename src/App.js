@@ -15,7 +15,7 @@
  *
  */
 
-import React, {lazy} from "react";
+import React, {lazy,useContext, useEffect} from "react";
 import ReactDOM from "react-dom/client";
 import "../index.css";
 import { Header } from "./components/Header";
@@ -26,15 +26,30 @@ import { Contact } from "./components/Contact";
 // import { Grocery } from "./components/Grocery";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router";
 import { RestaurantMenu } from "./components/RestaurantMenu";
+import { UserContext } from "./utils/UserContext";
 
 const About  = lazy(() => import("./components/About").then(module => ({ default: module.About })));
 const Grocery = lazy(() => import("./components/Grocery").then(module => ({ default: module.Grocery })));
 const AppLayout = () => {
+  const [userName, setUserName] = React.useState("");
+  useEffect(() => {
+    // make an api call and send login data
+    const data = {
+      LoggedInData: "vikash kumar",
+    };
+    setUserName(data.LoggedInData);
+  }, []);
+  
   return (
-    <div id="app">
+    <UserContext.Provider value={{LoggedInData: userName}}>
+      <div id="app">
+        <input className="border border-black" />
+
       <Header />
       <Outlet />
     </div>
+    </UserContext.Provider>
+    
   );
 };
 const root = ReactDOM.createRoot(document.getElementById("root"));

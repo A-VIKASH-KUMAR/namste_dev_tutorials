@@ -38,6 +38,8 @@ export const Body = () => {
     const getRestaurants = async () => {
       try {
         const json = await fetchData();
+        console.log("restaurants data", json);
+        
         const restaurants = extractRestaurants(json?.data?.data.cards);
         setListOfRestaurants(restaurants);
         setFilteredRestaurants(restaurants);
