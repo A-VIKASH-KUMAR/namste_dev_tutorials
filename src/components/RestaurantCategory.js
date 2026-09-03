@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { SWIGGY_IMAGE_BASE_URL } from "../utils/constants";
-
+import { useDispatch } from "react-redux";
+import { addItem } from "../utils/appSlices";
 export const RestaurantCategory = ({ data, showItems, setShowIndex }) => {
+  const dispatch = useDispatch();
+
   const handleClick = () => {
     setShowIndex();
   };
-
   return (
     <div>
       <div className="w-full mx-auto my-4 bg-white shadow-lg p-4 rounded-lg">
@@ -49,7 +51,7 @@ export const RestaurantCategory = ({ data, showItems, setShowIndex }) => {
                         className="w-32 h-32 object-cover rounded-xl shadow-sm"
                       />
                     )}
-                    <button className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-white text-green-600 border font-bold border-gray-300 shadow-md px-6 py-1.5 rounded-lg hover:bg-gray-50 w-max">
+                    <button className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-white text-green-600 border font-bold border-gray-300 shadow-md px-6 py-1.5 rounded-lg hover:bg-gray-50 w-max" onClick={() => dispatch(addItem(item))}>
                       ADD
                     </button>
                   </div>

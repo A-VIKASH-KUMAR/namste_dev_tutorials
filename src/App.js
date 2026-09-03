@@ -27,7 +27,8 @@ import { Contact } from "./components/Contact";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router";
 import { RestaurantMenu } from "./components/RestaurantMenu";
 import { UserContext } from "./utils/UserContext";
-
+import { Provider } from "react-redux";
+import { store } from "./utils/appStore";
 const About  = lazy(() => import("./components/About").then(module => ({ default: module.About })));
 const Grocery = lazy(() => import("./components/Grocery").then(module => ({ default: module.Grocery })));
 const AppLayout = () => {
@@ -41,6 +42,7 @@ const AppLayout = () => {
   }, []);
   
   return (
+    <Provider store={store}>
     <UserContext.Provider value={{LoggedInData: userName}}>
       <div id="app">
         <input className="border border-black" />
@@ -49,7 +51,7 @@ const AppLayout = () => {
       <Outlet />
     </div>
     </UserContext.Provider>
-    
+    </Provider>
   );
 };
 const root = ReactDOM.createRoot(document.getElementById("root"));

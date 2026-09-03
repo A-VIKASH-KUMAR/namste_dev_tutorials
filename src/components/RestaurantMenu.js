@@ -4,7 +4,7 @@ import { SWIGGY_IMAGE_BASE_URL } from "../utils/constants";
 
 import { useRestaurantMenu } from "../utils/useRestaurantMenu";
 import { RestaurantCategory } from "./RestaurantCategory";
-
+import { useDispatch } from "react-redux";
 export const RestaurantMenu = () => {
   const [menuItems, setMenuItems] = useState(null);
   const [restaurantInfo, setRestaurantInfo] = useState(null);
